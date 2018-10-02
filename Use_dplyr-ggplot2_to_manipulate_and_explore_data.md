@@ -7,7 +7,7 @@ library( gapminder )
 library( tidyverse )
 ```
 
-**Get the maximum and minimum of GDP per capita for all continents.**
+**TASK1 Get the maximum and minimum of GDP per capita for all continents.**
 
 ``` r
 min_max <- gapminder %>%
@@ -36,7 +36,7 @@ ggplot( min_max, aes( min_gdpPercap, max_gdpPercap )) +
 
 According to the table and figure, we can obtain the maximum and minimum gdp per capita for all continents. The figure gives us a perceptual intuition of the differences of the gdp/captia gap. As shown in the figure above, we can notice that the gaps of gdp/capita are very different among the 5 continents and Asia has the largest gap of gdp/capita.
 
-**Look at the spread of GDP per capita within the continents.**
+**TASK2 Look at the spread of GDP per capita within the continents.**
 
 ``` r
 range_captia <- gapminder %>%
@@ -87,7 +87,7 @@ range_captia %>%
 
 Except summarizing the spread of each continent by table, we can also use boxplot and line. Boxplot gives us the maximum and minimum values , quartiles and outliers of a group data, but it cannot show the standard deviation of data. From the figures above, Asia has the highest gdp/capita and the highest standaed deviation while Afica has the lowest gdp/capita and standard deviation.
 
-**Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.**
+**TASK3 Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean.**
 
 ``` r
 years <- gapminder %>%
@@ -128,7 +128,7 @@ ggplot( years )+
 
 As shown in the figrue above, typically, life expectancy increases with the increase of year. I met one problem when I did this task. When I wanted show the total number of people each year by using sum(pop), I got lots of "NA". Then I googled this problem and found a [helpful link in stackoverflow](https://stackoverflow.com/questions/46747986/sum-in-dplyr-and-aggregate-na-values). When we want to sum int, we need to convert it into numeric first.
 
-**How is life expectancy changing over time on different continents?**
+**TASK4 How is life expectancy changing over time on different continents?**
 
 ``` r
 ## NOTICE: a easier way to calculate meanLife1952 is to function first(), 
@@ -195,7 +195,7 @@ lifeChange %>%
 
 The blue lines represent the changes of life expectancy every 5 years and the orange ones represent the change of life expectancy compared with 1952. According to the graphs, compared with 1952, the life expectany of each continent has risen. However, when it comes to the life expectant changes in 5 years, we can notice that there are some values less than 0 appearing in the graph of Africa. That is to say, life expectancy in Africa has a negative growth.
 
-**Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.**
+**TASK5 Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.**
 
 ``` r
 ### check if the life expectancy of a country is lower than 
@@ -270,7 +270,7 @@ if_lowlifeExp %>%
 
 In this task, I used two method to count the number of countries which have a life expectancy lower than the mean life expectancy. One method is to use n() and the other is with the help of geom\_bar(). According to the table or the graph above, we can notice that each 5 years, Africa has the largest number of country with low life expectancy. But the large number may be based on the large total number of countries in Africa, so checking the percentage maybe more convinced.
 
-**Find countries with interesting stories. Open-ended and, therefore, hard. Promising but unsuccessful attempts are encouraged. This will generate interesting questions to follow up on in class**
+**TASK6 Find countries with interesting stories. Open-ended and, therefore, hard. Promising but unsuccessful attempts are encouraged. This will generate interesting questions to follow up on in class**
 
 ***According to the last task, we can notice that Africa has the largest number of countries with low life expectancy, but I would like to know the percentage of the countries with low life expectancy in each continent***
 
