@@ -78,7 +78,7 @@ grid.arrange(tableGrob(range_captia),
 
 ![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task2-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task2-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task2-2.png)
 
 Except summarizing the spread of each continent by table, we can also use boxplot and line. Boxplot gives us the maximum and minimum values , quartiles and outliers of a group data, but it cannot show the standard deviation of data. From the figures above, Asia has the highest gdp/capita and the highest standaed deviation while Afica has the lowest gdp/capita and standard deviation.
 
