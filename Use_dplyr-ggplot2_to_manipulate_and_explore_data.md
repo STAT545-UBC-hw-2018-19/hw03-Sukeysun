@@ -5,6 +5,10 @@ Sukey
 ``` r
 library( gapminder )
 library( tidyverse )
+library(knitr)
+library(grid)
+library(gridBase)
+library(gridExtra)
 ```
 
 **TASK1 Get the maximum and minimum of GDP per capita for all continents.**
@@ -14,25 +18,24 @@ min_max <- gapminder %>%
   group_by( continent ) %>%   
   summarize( min_gdpPercap = min( gdpPercap ), max_gdpPercap = max( gdpPercap )) 
 
-knitr::kable( head( min_max ) )
+plt <- ggplot( min_max, aes( min_gdpPercap, max_gdpPercap )) +
+  geom_point( aes( color = continent, size = ( difference = max_gdpPercap - min_gdpPercap ))) +
+  ggtitle("Differences between maximum gdpperCap and minimum gdpperCap
+         in all continents") +
+  theme(plot.title = element_text(size=16))
+  
 
-ggplot( min_max, aes( min_gdpPercap, max_gdpPercap )) +
-  geom_point( aes( color = continent, size = ( max_gdpPercap - min_gdpPercap ))) +
-  ggtitle("Differences between maximum gdpperCap and minimum gdpperCap 
-         in all continents")
+tt <- ttheme_default(colhead=list(fg_params = list(parse=TRUE)))
+min_max_table <- tableGrob(min_max, rows=NULL, theme=tt)
+# Plot chart and table into one object
+
+grid.arrange(min_max_table, plt, 
+             nrow = 1)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-2-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task1-1.png)
 
-| continent |  min\_gdpPercap|  max\_gdpPercap|
-|:----------|---------------:|---------------:|
-| Africa    |        241.1659|        21951.21|
-| Americas  |       1201.6372|        42951.65|
-| Asia      |        331.0000|       113523.13|
-| Europe    |        973.5332|        49357.19|
-| Oceania   |      10039.5956|        34435.37|
-
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-2-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task1-1.png)
 
 According to the table and figure, we can obtain the maximum and minimum gdp per capita for all continents. The figure gives us a perceptual intuition of the differences of the gdp/captia gap. As shown in the figure above, we can notice that the gaps of gdp/capita are very different among the 5 continents and Asia has the largest gap of gdp/capita.
 
@@ -51,39 +54,31 @@ range_captia <- gapminder %>%
     ## Warning: package 'bindrcpp' was built under R version 3.5.1
 
 ``` r
-knitr::kable( range_captia )
-```
+#knitr::kable( range_captia )
 
-| continent | gdp\_range                |  mean\_gdp|    md\_gdp|    sd\_gdp|
-|:----------|:--------------------------|----------:|----------:|----------:|
-| Africa    | 241.1658765 ~ 21951.21176 |   2193.755|   1192.138|   2827.930|
-| Americas  | 1201.637154 ~ 42951.65309 |   7136.110|   5465.510|   6396.764|
-| Asia      | 331 ~ 113523.1329         |   7902.150|   2646.787|  14045.373|
-| Europe    | 973.5331948 ~ 49357.19017 |  14469.476|  12081.749|   9355.213|
-| Oceania   | 10039.59564 ~ 34435.36744 |  18621.609|  17983.304|   6358.983|
-
-``` r
-ggplot( gapminder, aes( continent, gdpPercap )) +
+spreadplt <- ggplot( gapminder, aes( continent, gdpPercap )) +
   geom_boxplot( aes( fill = continent ))+
   labs( x = "continent", y = "gdp/capita", 
               title = "spread of GDP per capita within the continents")
-```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-3-1.png)
-
-``` r
-range_captia %>%
+rangeplt <- range_captia %>%
   ggplot() +
   geom_line( aes( x = continent, y = mean_gdp, color = "mean",group = 1 ))+
   geom_line( aes( x = continent,y = md_gdp,color = "median",group = 1 )) +
   geom_line( aes( x = continent,y = sd_gdp,color = "standard deviation",group = 1 ))+
   labs(x = "continent", y = "gdp/capita", 
-              title = "spread of GDP per capita within the continents")
+              title = "spread of GDP per capita within the continents") +
+  theme(plot.title = element_text(size=22))
+  
+grid.arrange(tableGrob(range_captia),
+             spreadplt,
+             rangeplt,
+             nrow = 2)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-3-2.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task2-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-3-1.png) ![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-3-2.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task2-1.png)
 
 Except summarizing the spread of each continent by table, we can also use boxplot and line. Boxplot gives us the maximum and minimum values , quartiles and outliers of a group data, but it cannot show the standard deviation of data. From the figures above, Asia has the highest gdp/capita and the highest standaed deviation while Afica has the lowest gdp/capita and standard deviation.
 
@@ -96,35 +91,23 @@ years <- gapminder %>%
             mean = mean( lifeExp ),
             weighted_mean = weighted.mean( lifeExp, pop )) # weighted.mean could compute a weighted mean.lifeExp is an object which mean is to be compute and pop is an numerical vector to compute the weight
 
-knitr::kable( years )
-```
+#knitr::kable( years )
 
-|  year|         num|      mean|  weighted\_mean|
-|-----:|-----------:|---------:|---------------:|
-|  1952|  2406957150|  49.05762|        48.94424|
-|  1957|  2664404580|  51.50740|        52.12189|
-|  1962|  2899782974|  53.60925|        52.32438|
-|  1967|  3217478384|  55.67829|        56.98431|
-|  1972|  3576977158|  57.64739|        59.51478|
-|  1977|  3930045807|  59.57016|        61.23726|
-|  1982|  4289436840|  61.53320|        62.88176|
-|  1987|  4691477418|  63.21261|        64.41635|
-|  1992|  5110710260|  64.16034|        65.64590|
-|  1997|  5515204472|  65.01468|        66.84934|
-|  2002|  5886977579|  65.69492|        67.83904|
-|  2007|  6251013179|  67.00742|        68.91909|
-
-``` r
-ggplot( years )+
+meanplt <- ggplot( years )+
   geom_line( aes( x = year, y = mean, color = "mean",group = 1 ))+
   geom_line( aes( x = year,y = weighted_mean,color = "weighted_mean",group = 1 )) +
   labs(x = "year", y = "lifeExp", 
-              title = "mean/weighed mean of life expectancy for each year")
+              title = "mean/weighed mean of life expectancy for each year") +
+  theme(plot.title = element_text(size=22))
+
+grid.arrange(tableGrob(years),
+             meanplt,
+             nrow =1)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task3-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-4-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task3-1.png)
 
 As shown in the figrue above, typically, life expectancy increases with the increase of year. I met one problem when I did this task. When I wanted show the total number of people each year by using sum(pop), I got lots of "NA". Then I googled this problem and found a [helpful link in stackoverflow](https://stackoverflow.com/questions/46747986/sum-in-dplyr-and-aggregate-na-values). When we want to sum int, we need to convert it into numeric first.
 
@@ -156,24 +139,10 @@ lifeChange <- lifeChange %>%
  
   
 ## it is really a long table, I would like to only show the first 10 rows
-knitr::kable( head( lifeChange,10 ))   
-```
+#knitr::kable( head( lifeChange,10 ))   
 
-| continent |  year|  mean\_life|  meanLife1952|  change\_5years|  change\_1952|
-|:----------|-----:|-----------:|-------------:|---------------:|-------------:|
-| Africa    |  1952|    39.13550|       39.1355|              NA|      0.000000|
-| Africa    |  1957|    41.26635|       39.1355|       2.1308462|      2.130846|
-| Africa    |  1962|    43.31944|       39.1355|       2.0530962|      4.183942|
-| Africa    |  1967|    45.33454|       39.1355|       2.0150962|      6.199039|
-| Africa    |  1972|    47.45094|       39.1355|       2.1164038|      8.315442|
-| Africa    |  1977|    49.58042|       39.1355|       2.1294808|     10.444923|
-| Africa    |  1982|    51.59287|       39.1355|       2.0124423|     12.457365|
-| Africa    |  1987|    53.34479|       39.1355|       1.7519231|     14.209288|
-| Africa    |  1992|    53.62958|       39.1355|       0.2847885|     14.494077|
-| Africa    |  1997|    53.59827|       39.1355|      -0.0313077|     14.462769|
 
-``` r
-lifeChange %>% 
+changeplt <- lifeChange %>% 
   filter(!is.na( change_5years )) %>% 
   ggplot() +
   facet_wrap(~ continent) +
@@ -186,12 +155,17 @@ lifeChange %>%
           strip.text.y = element_text( size = 10, face = "bold" ),
           strip.background = element_rect( colour = "red", fill = "#CCCCFF" )) +
   labs(x = "year", y = "life Expectany Change", 
-              title = "life Expectany Change for each continent")
+              title = "  life Expectany Change for each continent  ") +
+  theme(plot.title = element_text(size=22))
+  
+grid.arrange(tableGrob( head( lifeChange, 10)),
+             changeplt,
+             nrow = 1)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task4-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-5-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task4-1.png)
 
 The blue lines represent the changes of life expectancy every 5 years and the orange ones represent the change of life expectancy compared with 1952. According to the graphs, compared with 1952, the life expectany of each continent has risen. However, when it comes to the life expectant changes in 5 years, we can notice that there are some values less than 0 appearing in the graph of Africa. That is to say, life expectancy in Africa has a negative growth.
 
@@ -209,23 +183,9 @@ if_lowlifeExp <- gapminder %>%
   select (year, country , continent, lifeExp, less) %>% 
   arrange( year ) 
 
-knitr::kable( head( if_lowlifeExp,10 ))
-```
+#knitr::kable( head( if_lowlifeExp,10 ))
 
-|  year| country     | continent |  lifeExp| less   |
-|-----:|:------------|:----------|--------:|:-------|
-|  1952| Afghanistan | Asia      |   28.801| lower  |
-|  1952| Albania     | Europe    |   55.230| lower  |
-|  1952| Algeria     | Africa    |   43.077| higher |
-|  1952| Angola      | Africa    |   30.015| lower  |
-|  1952| Argentina   | Americas  |   62.485| higher |
-|  1952| Australia   | Oceania   |   69.120| lower  |
-|  1952| Austria     | Europe    |   66.800| higher |
-|  1952| Bahrain     | Asia      |   50.939| higher |
-|  1952| Bangladesh  | Asia      |   37.484| lower  |
-|  1952| Belgium     | Europe    |   68.000| higher |
 
-``` r
 ### check how many countries' life expectancy is lower than 
 ### the mean life expectancy of this year in each continent
 
@@ -238,35 +198,27 @@ count_lowlifeExp <- gapminder %>%
   group_by( year ) %>% 
   arrange( year )
 
-knitr::kable( head( count_lowlifeExp,10))
-```
+#knitr::kable( head( count_lowlifeExp,10))
 
-|  year| continent |  num\_lower|
-|-----:|:----------|-----------:|
-|  1952| Africa    |          27|
-|  1952| Americas  |          12|
-|  1952| Asia      |          19|
-|  1952| Europe    |          12|
-|  1952| Oceania   |           1|
-|  1957| Africa    |          28|
-|  1957| Americas  |          12|
-|  1957| Asia      |          18|
-|  1957| Europe    |          12|
-|  1957| Oceania   |           1|
-
-``` r
 ##### or use geom_bar to count
 
-if_lowlifeExp %>% 
+ifplt <- if_lowlifeExp %>% 
   filter( less == "lower" ) %>%
   ggplot() +
   geom_bar( aes( year, fill = continent)) +
-  ggtitle( "distrubtion of life expectancy "  )
+  ggtitle( "distrubtion of life expectancy "  ) +
+  theme(plot.title = element_text(size=22))
+
+grid.arrange(tableGrob( head( if_lowlifeExp, 10)),
+             tableGrob( head( count_lowlifeExp,10 )),
+             ifplt,
+             nrow =2 , 
+             ncol = 2)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task5-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-6-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task5-1.png)
 
 In this task, I used two method to count the number of countries which have a life expectancy lower than the mean life expectancy. One method is to use n() and the other is with the help of geom\_bar(). According to the table or the graph above, we can notice that each 5 years, Africa has the largest number of country with low life expectancy. But the large number may be based on the large total number of countries in Africa, so checking the percentage maybe more convinced.
 
@@ -286,24 +238,9 @@ newtable <- merge( count_lowlifeExp, ncountry,
                    by = c( "year", "continent" )) %>%
   mutate(percentage = num_lower/ncountry)
 
-knitr::kable ( head( newtable, 10))
-```
+#knitr::kable ( head( newtable, 10))
 
-|  year| continent |  num\_lower|  ncountry|  percentage|
-|-----:|:----------|-----------:|---------:|-----------:|
-|  1952| Africa    |          27|       624|   0.0432692|
-|  1952| Americas  |          12|       300|   0.0400000|
-|  1952| Asia      |          19|       396|   0.0479798|
-|  1952| Europe    |          12|       360|   0.0333333|
-|  1952| Oceania   |           1|        24|   0.0416667|
-|  1957| Africa    |          28|       624|   0.0448718|
-|  1957| Americas  |          12|       300|   0.0400000|
-|  1957| Asia      |          18|       396|   0.0454545|
-|  1957| Europe    |          12|       360|   0.0333333|
-|  1957| Oceania   |           1|        24|   0.0416667|
-
-``` r
-newtable %>% 
+newplt <- newtable %>% 
   ggplot()+
   facet_wrap( ~ continent , scales = "free") +
   geom_line( aes( year, percentage)) +
@@ -311,9 +248,13 @@ newtable %>%
           strip.text.y = element_text( size = 10, face = "bold" ),
           strip.background = element_rect( colour = "red", fill = "#CCCCFF" )) +
   labs( title = ("Percentage of country with low life expectancy in each continent"))
+  
+grid.arrange(tableGrob( head( newtable, 10) ),
+             newplt,
+             nrow = 1)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-7-1.png) ![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-7-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task6-1-1.png) ![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task6-1-1.png)
 
 According to the graph above, we can summarize something interesting. The percentages of country with low life expectancy in Oceania are same in each 5 years. Asia has a sharp decrease of low life expectancy sine 1970 while Africa has a slight increase after the same year.
 
@@ -328,16 +269,20 @@ Africa_Asia <- gapminder %>%
   summarize( mean_gdp = mean(gdpPercap)) 
 
 
-Africa_Asia %>% 
+aaplt <- Africa_Asia %>% 
   ggplot() +
   geom_line( aes( year, mean_gdp, 
                   color = continent,
                   size = 0.5 )) +
   labs(title = ("gdp/capita trend of Africa and Asia"))
+
+grid.arrange(tableGrob( head( Africa_Asia, 10)),
+             aaplt,
+             nrow = 1)
 ```
 
-![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![](Use_dplyr-ggplot2_to_manipulate_and_explore_data_files/figure-markdown_github/Task6-2-1.png)
 
-![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/unnamed-chunk-8-1.png)
+![](https://github.com/STAT545-UBC-students/hw03-Sukeysun/blob/master/pictures/Task6-2-1.png)
 
-We can notice that, generally, Asia has a fast increase of gdp/capita while Afica has a slow increase of gdp/capita.
+We can notice that, generally, Asia has a fast increase of gdp/capita while Afica has a slow increase of gdp/capita. Especially around 1972, both mean gdp of Asia and Africa reached a small peak.
