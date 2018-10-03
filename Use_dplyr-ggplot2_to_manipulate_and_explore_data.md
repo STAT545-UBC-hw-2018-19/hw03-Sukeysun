@@ -59,7 +59,8 @@ range_captia <- gapminder %>%
 spreadplt <- ggplot( gapminder, aes( continent, gdpPercap )) +
   geom_boxplot( aes( fill = continent ))+
   labs( x = "continent", y = "gdp/capita", 
-              title = "spread of GDP per capita within the continents")
+              title = "spread of GDP per capita within the continents") +
+  theme(plot.title = element_text(size=22))
 
 rangeplt <- range_captia %>%
   ggplot() +
