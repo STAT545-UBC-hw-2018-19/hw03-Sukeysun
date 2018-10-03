@@ -46,7 +46,7 @@ According to the table and figure, we can obtain the maximum and minimum gdp per
 
 
 **TASK2 Look at the spread of GDP per capita within the continents.**
-```{r Task2, fig.height=5, fig.width=16}
+```{r Task2, fig.height=10, fig.width=15}
 range_captia <- gapminder %>%
   group_by( continent ) %>% 
   summarize( min_gdp = min( gdpPercap ), max_gdp = max( gdpPercap ),
@@ -60,7 +60,8 @@ range_captia <- gapminder %>%
 spreadplt <- ggplot( gapminder, aes( continent, gdpPercap )) +
   geom_boxplot( aes( fill = continent ))+
   labs( x = "continent", y = "gdp/capita", 
-              title = "spread of GDP per capita within the continents")
+              title = "spread of GDP per capita within the continents") +
+  theme(plot.title = element_text(size=22))
 
 rangeplt <- range_captia %>%
   ggplot() +
